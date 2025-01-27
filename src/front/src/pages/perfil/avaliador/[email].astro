@@ -1,0 +1,485 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/Header.astro";
+import Logo from "../../../components/Logo.astro";
+import Loading from "../../../components/Loading.astro";
+
+import { Icon } from "astro-icon/components";
+
+const { email } = Astro.params;
+---
+
+<Layout title={"Gostô? - Perfil"}>
+  <span class="hidden" id="email-param">{email}</span>
+  <Loading />
+  <Header />
+  <Logo />
+  <main>
+    <!-- Coluna 1: Perfil e Info -->
+    <div class="column-1">
+      <section class="profile">
+        <img src="" alt="" class="banner-image" id="banner-img" />
+        <img src="" alt="" class="profile-image" id="profile-img" />
+        <h2 class="font-semibold mt-2 mb-5 text-lg" id="profile-name"></h2>
+        <div class="profile-actions flex" id="profile-actions">
+          <p class="edit-action" id="edit-action">
+            <Icon
+              name="hugeicons:pencil-edit-01"
+              size={30}
+              color="rgb(var(--second-color))"
+              class="icon text-yellow-500"
+            />
+          </p>
+          <p class="delete-action" id="delete-action">
+            <Icon
+              name="hugeicons:delete-03"
+              size={30}
+              color="rgb(var(--second-color))"
+              class="icon text-red-600"
+            />
+          </p>
+        </div>
+      </section>
+
+      <section class="info hidden" id="reviewer-info">
+        <h2 class="font-bold text-2xl mb-3">Informações do Avaliador</h2>
+        <h3 class="font-bold text-xl">Telefone</h3>
+        <p id="reviewer-tel"></p>
+        <h3 class="font-bold text-xl">Email</h3>
+        <p id="reviewer-email"></p>
+        <h3 class="font-bold text-xl">Data de Nascimento</h3>
+        <p id="birth"></p>
+      </section>
+    </div>
+
+    <!-- Modal de Exclusão -->
+    <article
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
+      id="modal-delete"
+    >
+      <div class="bg-slate-50 rounded-lg p-6 shadow-lg w-80">
+        <h3 class="text-black text-lg font-semibold mb-4">
+          Para excluir sua conta, confirme sua senha
+        </h3>
+        <input
+          type="password"
+          id="password"
+          placeholder="Senha"
+          class="w-full p-2 mb-4 border border-white rounded-md bg-slate-100 text-black placeholder-gray-400"
+        />
+        <div class="flex justify-between">
+          <button
+            id="confirm-delete"
+            class="bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700"
+            >Excluir</button
+          >
+          <button
+            id="cancel-delete"
+            class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-500"
+            >Cancelar</button
+          >
+        </div>
+      </div>
+    </article>
+
+    <!-- Coluna 2: Formulário de Edição e Reviews -->
+    <div class="column-2">
+      <nav class="section-nav">
+        <input
+          type="radio"
+          id="reviews-radio"
+          name="section"
+          class="nav-radio"
+          checked
+        />
+        <label for="reviews-radio" class="nav-label">Avaliações</label>
+
+        <input
+          type="radio"
+          id="reservas-radio"
+          name="section"
+          class="nav-radio"
+        />
+        <label for="reservas-radio" class="nav-label">Reservas</label>
+      </nav>
+
+      <section class="edit hidden" id="edit-section">
+        <h3 class="font-bold text-2xl text-center">
+          Editar Informações do Perfil
+        </h3>
+        <form class="edit-form" id="edit-form">
+          <div class="form-group">
+            <label for="banner-image" class="block font-semibold"
+              >Imagem de Banner:</label
+            >
+            <label
+              class="file-label flex justify-center items-center text-center bg-orange-600 text-white rounded-lg px-4 py-2 cursor-pointer hover:bg-orange-700 transition duration-200"
+            >
+              <input
+                type="file"
+                id="banner-image"
+                name="banner-image"
+                accept="image/*"
+                class="hidden"
+              />
+              <span class="file-icon mr-2 flex justify-center">
+                <Icon name="hugeicons:inbox-upload" size={24} color="white" />
+              </span>
+              <span class="file-label text-white font-semibold"
+                >Upload Banner</span
+              >
+            </label>
+          </div>
+
+          <!-- Campo de Imagem de Perfil -->
+          <div class="form-group overflow-x-hidden mt-4">
+            <label for="profile-image" class="block font-semibold"
+              >Imagem de Perfil:</label
+            >
+            <label
+              class="file-label flex text-center bg-orange-600 text-white rounded-lg px-4 py-2 cursor-pointer hover:bg-orange-700 transition duration-200"
+            >
+              <input
+                type="file"
+                id="profile-image"
+                name="profile-image"
+                accept="image/*"
+                class="hidden"
+              />
+              <span class="file-icon mr-2 flex justify-center">
+                <Icon name="hugeicons:inbox-upload" size={24} color="white" />
+              </span>
+              <span class="file-label text-white font-semibold"
+                >Upload Perfil</span
+              >
+            </label>
+          </div>
+
+          <!-- Campo Nome -->
+          <div class="form-group">
+            <label for="name">Nome:</label>
+            <input type="text" id="name-field" name="name" />
+          </div>
+
+          <!-- Campo Telefone -->
+          <div class="form-group">
+            <label for="tel">Telefone:</label>
+            <input type="tel" id="tel-field" name="tel" />
+          </div>
+
+          <!-- Renderização Condicional: Avaliador -->
+          <div id="reviewer-fields" class="hidden">
+            <div class="form-group">
+              <label for="birth-field">Data de Nascimento:</label>
+              <input type="date" id="birth-field" name="birth" />
+            </div>
+          </div>
+
+          <!-- Botão Salvar -->
+          <button type="submit" class="btn-save font-semibold">Salvar</button>
+        </form>
+      </section>
+
+      <section
+        class="reviews bg-gray-100 rounded-lg shadow-lg"
+        id="reviews-section"
+      >
+        <h3 class="font-bold text-2xl mb-3">Avaliações recentes</h3>
+        <div id="reviews" class="flex flex-col items-center px-5"></div>
+      </section>
+
+      <section
+        class="reservas hidden bg-gray-100 rounded-lg shadow-lg p-5"
+        id="reservas-section"
+      >
+        <h3 class="font-bold text-2xl mb-3">Reservas</h3>
+
+        <!-- Container para Reservas Pendentes -->
+        <div id="reservas-pendentes-container" class="mb-5">
+          <h4 class="font-semibold text-xl mb-2">Reservas Pendentes</h4>
+          <div class="reservas-list overflow-x-auto flex whitespace-nowrap space-x-4 px-2">
+          </div>
+        </div>
+
+        <!-- Container para Reservas Aprovadas -->
+        <div id="reservas-aprovadas-container">
+          <h4 class="font-semibold text-xl mb-2">Reservas Aprovadas</h4>
+          <div class="reservas-list overflow-x-auto flex whitespace-nowrap space-x-4 px-2">
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import "@assets/scripts/avaliador.ts";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const radios = document.querySelectorAll(".nav-radio"); // Seleciona os botões de rádio
+    const sections = {
+      "reviews-radio": document.getElementById("reviews-section"),
+      "reservas-radio": document.getElementById("reservas-section"), // Atualize o ID conforme necessário
+    };
+
+    radios.forEach((radio: HTMLInputElement) => {
+      radio.addEventListener("change", () => {
+        Object.values(sections).forEach((section) =>
+          section.classList.add("hidden")
+        );
+
+        if (radio.checked) {
+          sections[radio.id]?.classList.remove("hidden");
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+  }
+
+  main {
+    @apply flex flex-row gap-10;
+    overflow: scroll;
+  }
+
+  /* Estilo da navegação */
+  .section-nav {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  /* Esconde os radio buttons */
+  .nav-radio {
+    display: none;
+  }
+
+  /* Estilo do label (botões de navegação) */
+  .nav-label {
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #333;
+    transition: border-bottom 0.3s ease;
+  }
+
+  /* Borda inferior laranja quando o radio é selecionado */
+  .nav-radio:checked + .nav-label {
+    border-bottom: 2px solid orange;
+    color: orange;
+  }
+
+  /* Quando o radio "Avaliações" é selecionado, mostra a seção correspondente */
+  #reviews-radio:checked ~ #reviews-section {
+    display: block;
+  }
+
+  /* Quando o radio "Mesas" é selecionado, mostra a seção correspondente */
+  #tables-radio:checked ~ #tables-section {
+    display: block;
+  }
+
+  .column-1 {
+    @apply flex flex-col gap-5 w-2/5;
+  }
+
+  .column-2 {
+    @apply flex flex-col gap-5 w-3/5;
+  }
+
+  .column-2 > section {
+    @apply py-3;
+  }
+
+  /* Estilos para a barra de rolagem do elemento com a classe 'image-row' */
+  .image-row {
+    scrollbar-color: #555 transparent; /* Para navegadores baseados em Firefox */
+  }
+
+  .image-row::-webkit-scrollbar {
+    height: 10px; /* Altura da barra de rolagem */
+  }
+
+  .image-row::-webkit-scrollbar-thumb {
+    background-color: rgb(
+      var(--second-color)
+    ); /* Cor do "thumb" da barra de rolagem */
+    border-radius: 10px; /* Bordas arredondadas */
+  }
+
+  .image-row::-webkit-scrollbar-track {
+    background: transparent; /* Cor do fundo da barra de rolagem */
+  }
+
+  /* Estilo da seção de perfil */
+  .profile {
+    @apply bg-gray-100 rounded-lg shadow-lg flex flex-col items-center relative;
+  }
+
+  .banner-image {
+    @apply w-full h-32 rounded-t-lg object-cover; /* Define a largura total, altura e arredonda o topo */
+    background: rgb(
+      var(--support-color)
+    ); /* Cor de fundo caso a imagem não carregue */
+  }
+
+  .profile-image {
+    @apply h-24 rounded-full mt-5;
+  }
+
+  .icon {
+    @apply transition transform duration-200;
+  }
+
+  .icon:hover {
+    @apply scale-105;
+  }
+
+  .header-info {
+    @apply inline-flex justify-between w-full;
+  }
+
+  .profile-actions {
+    @apply px-5 pb-5 justify-between w-full;
+  }
+
+  .edit-action {
+    @apply text-yellow-500 cursor-pointer;
+  }
+
+  .delete-action {
+    @apply text-red-600 cursor-pointer;
+  }
+
+  /* Estilo da seção de edição */
+  .edit {
+    @apply bg-gray-50 p-5 rounded-lg shadow-lg text-left;
+  }
+
+  .form-group label {
+    @apply block text-gray-700 font-semibold indent-1 mb-1;
+  }
+
+  .form-group input:not(input[type="file"]),
+  select,
+  textarea {
+    @apply p-2 border border-gray-300 rounded-lg w-full;
+  }
+
+  .edit-form {
+    @apply flex flex-col gap-5 mt-5;
+  }
+
+  .edit-form input:not(input[type="file"]) {
+    @apply p-2 border border-gray-300 rounded-lg;
+  }
+
+  .btn-save {
+    @apply mt-5 text-white p-3 rounded-lg;
+    background-color: rgb(var(--support-color));
+  }
+
+  .btn-save:hover {
+    background-color: rgb(var(--support-darkest-color));
+  }
+
+  /* Estilo dos cards de avaliação */
+  .review-card {
+    @apply bg-white p-5 rounded-lg shadow-lg mb-5;
+  }
+
+  /* Cabeçalho da review: Nome e data justificados */
+  .review-header {
+    @apply flex justify-between items-center mb-3;
+  }
+
+  .review-header h4 {
+    @apply font-bold text-lg;
+  }
+
+  .review-header .review-date {
+    @apply text-sm text-gray-500;
+  }
+
+  /* Conteúdo da review */
+  .review-content {
+    @apply mb-3 text-gray-800 text-left text-wrap;
+    overflow-wrap: break-word; /* Quebra as palavras muito longas */
+    word-wrap: break-word; /* Compatibilidade com versões mais antigas */
+    white-space: normal; /* Permite a quebra de linha automática */
+  }
+
+  /* Layout do carrossel */
+  .review-carousel {
+    @apply relative w-full h-48 overflow-hidden rounded-lg mt-3;
+  }
+
+  .carousel-images {
+    @apply flex w-full h-full transition-transform duration-500 ease-in-out;
+  }
+
+  .review-photo {
+    @apply w-full h-full object-cover rounded-lg;
+  }
+
+  /* Botões de navegação */
+  .carousel-prev,
+  .carousel-next {
+    @apply absolute top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full;
+    z-index: 10;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: background-color 0.2s;
+  }
+
+  .carousel-prev {
+    left: 10px;
+  }
+
+  .carousel-next {
+    right: 10px;
+  }
+
+  .carousel-prev:hover,
+  .carousel-next:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  /* Estilo para caso não haja fotos */
+  .no-photos {
+    @apply italic text-gray-500;
+  }
+
+  /* Estilo da seção de tipo (info) */
+  .info {
+    @apply bg-white px-5 py-8 rounded-lg shadow-lg text-left;
+
+    & p {
+      margin-bottom: 10px;
+    }
+  }
+
+  .info > *:not(.info > h2) {
+    margin-left: 20px;
+  }
+
+  /* Ajustes de responsividade */
+  @media (max-width: 768px) {
+    main {
+      @apply flex-col;
+    }
+
+    .column-1,
+    .column-2 {
+      @apply w-full;
+    }
+  }
+</style>

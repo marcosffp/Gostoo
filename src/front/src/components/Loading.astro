@@ -1,0 +1,29 @@
+<style>
+#loading-screen {
+  display: flex; /* Começa visível */
+}
+
+.spinner {
+  border-width: 4px;
+  border-style: solid;
+  border-color: #e5e7eb; /* cinza claro */
+  border-top-color: #ff5400; /* azul */
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
+
+<div id="loading-screen" class="fixed top-0 left-0 w-full h-full bg-white flex items-center justify-center z-50">
+    <div class="spinner border-t-4 border-orange-600 rounded-full w-12 h-12 animate-spin"></div>
+</div>

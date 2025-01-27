@@ -1,0 +1,466 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Logo from "../components/Logo.astro";
+import Loading from "../components/Loading.astro";
+
+import { Icon } from "astro-icon/components";
+import Avaliacao from "../components/Avaliacao.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="Gostô? - Descubra novos Lugares!">
+    <Loading />
+    <Header />
+    <Logo />
+    <main class="flex gap-2">
+        <!-- Barra lateral de Filtros -->
+        <aside class="filters" id="sidebar-filters">
+            <h1 class="font-bold text-3xl text-gray-900">Filtros</h1>
+            <form class="w-full p-2">
+                <div class="flex w-full mb-4">
+                    <input
+                        type="search"
+                        class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="Busque por Estabelecimentos"
+                        id="input-search"
+                        required
+                    />
+                    <button
+                        type="submit"
+                        class="text-white bg-orange-600 border border-orange-600 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-orange-300"
+                        id="button-search"
+                    >
+                        <Icon
+                            name="mingcute:search-line"
+                            size={30}
+                            class="icon text-white"
+                        />
+                    </button>
+                </div>
+            </form>
+
+            <section class="w-full">
+                <h2 class="font-semibold text-lg self-start m-4">Categorias</h2>
+                <div class="radio-container flex flex-wrap mb-4 gap-4">
+                    <div class="flex items-center">
+                        <input
+                            type="radio"
+                            id="alimentacao"
+                            name="categoria"
+                            value="alimentacao"
+                            class="appearance-none peer/alimentacao"
+                            checked
+                        />
+                        <label for="alimentacao" class="radio alimentacao"
+                            >Alimentação</label
+                        >
+                    </div>
+
+                    <div class="flex items-center">
+                        <input
+                            type="radio"
+                            id="entretenimento"
+                            name="categoria"
+                            value="entretenimento"
+                            class="appearance-none peer/entretenimento"
+                        />
+                        <label for="entretenimento" class="radio entretenimento"
+                            >Entretenimento</label
+                        >
+                    </div>
+
+                    <div class="flex items-center">
+                        <input
+                            type="radio"
+                            id="servicos"
+                            name="categoria"
+                            value="servicos"
+                            class="appearance-none peer/servicos"
+                        />
+                        <label for="servicos" class="radio servicos"
+                            >Serviços</label
+                        >
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="font-semibold text-lg self-start m-4">Tags</h2>
+                <!-- Formulário de busca de tags -->
+                <form class="flex" id="tag-form">
+                    <input
+                        class="p-2 border border-gray-300 rounded-lg"
+                        type="text"
+                        placeholder="Nome da tag"
+                        id="tag-field"
+                        required
+                    />
+                    <button type="submit" class="ml-1 self-center">
+                        <Icon
+                            name="hugeicons:circle-arrow-right-01"
+                            size={30}
+                            color="rgb(var(--second-color))"
+                            class="icon text-orange-600"
+                        />
+                    </button>
+                </form>
+
+                <!-- Lista de tags pesquisadas -->
+                <ul class="tags list-none flex flex-wrap" id="searched-tags">
+                </ul>
+            </section>
+        </aside>
+
+        <!-- Container de cards de Estabelecimentos -->
+        <div
+            class="flex flex-col justify-center flex-grow px-5"
+            role="contentinfo"
+        >
+            <h1 class="font-bold text-3xl mb-3 text-orange-600 text-center">
+                Estabelecimentos Favoritos
+            </h1>
+
+            <div class="radio-container">
+                <input
+                    type="radio"
+                    id="all-business"
+                    name="type"
+                    class="appearance-none peer/all-business"
+                    checked
+                />
+                <label for="all-business" class="radio all-business"
+                    >Todos os Estabelecimentos</label
+                >
+
+                <input
+                    type="radio"
+                    id="new-business"
+                    name="type"
+                    class="appearance-none peer/new-business"
+                />
+                <label for="new-business" class="radio new-business"
+                    >Novos Estabelecimentos</label
+                >
+            </div>
+
+            <section class="business-container" id="new-business-container">
+                <!-- Renderização dinâmica de Novos Estabelecimentos -->
+            </section>
+
+            <section class="business-container" id="all-business-container">
+                <!-- Renderização dinâmica de Todos os Estabelecimentos -->
+            </section>
+        </div>
+
+        <Avaliacao />
+    </main>
+    <Footer />
+</Layout>
+
+<script>
+    import Cookies from "js-cookie";
+    import { jwtDecode } from "jwt-decode";
+
+    const apiUrl = import.meta.env.PUBLIC_API_URL;
+    const token = Cookies.get("token");
+    interface JwtPayload {
+        type: number;
+        sub: string;
+        iat: number;
+        exp: number;
+        id: number;
+    }
+
+    const decodedToken: JwtPayload = jwtDecode(token);
+    const type = decodedToken.type;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const response = await fetch(`${apiUrl}/estabelecimento/`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                console.error(response.status);
+                return;
+            }
+
+            const estabelecimentos = await response.json();
+            console.log(estabelecimentos);
+
+            const newBusinessContainer = document.getElementById(
+                "new-business-container",
+            );
+            const allBusinessContainer = document.getElementById(
+                "all-business-container",
+            );
+            const tagForm = document.getElementById("tag-form");
+            const tagField = document.getElementById("tag-field");
+            const searchedTagsContainer =
+                document.getElementById("searched-tags");
+
+            let searchTerm = "";
+            let selectedTags = [];
+            let selectedCategory = "ALIMENTACAO";
+            const selectedType = document.querySelector(
+                'input[name="type"]:checked',
+            ).id;
+
+            const renderEstabelecimentos = (container, estabelecimentos) => {
+                container.innerHTML = "";
+
+                estabelecimentos.forEach((estabelecimento) => {
+                    const enderecoArray =
+                        estabelecimento.localidadeEstabelecimento.split(";");
+                    const [regiao, bairro, rua, numero, complemento] =
+                        enderecoArray;
+                    const enderecoFormatado = `${rua}, ${numero}${complemento && complemento.trim() !== "" ? ", " + complemento : ""} - ${bairro}, Região ${regiao}`;
+
+                    const card = `
+                        <article class="bg-white rounded-lg shadow-md m-2 p-4 max-w-xs flex flex-col">
+                            <img src="${convertToBase64(estabelecimento.imagemPerfil.blobImagem)}" alt="${estabelecimento.nomeEstabelecimento} Foto" class="rounded-2xl w-full h-24 object-cover mt-2"/>
+                            <h3 class="font-bold text-xl my-2">${estabelecimento.nomeEstabelecimento}</h3>
+                            <p class="text-gray-700">${enderecoFormatado}</p>
+                            <div class="flex items-center justify-center mt-2">
+                                <span class="text-yellow-500">
+                                    ${"★".repeat(Math.floor(estabelecimento.notaEstabelecimento))} 
+                                    ${"☆".repeat(5 - Math.floor(estabelecimento.notaEstabelecimento))}
+                                </span>
+                                <span class="ml-2 text-gray-500">(${estabelecimento.notaEstabelecimento.toFixed(1)})</span>
+                            </div>
+                            <div class="mt-4 flex justify-between">
+                                <a href="/perfil/estabelecimento/${estabelecimento.emailEstabelecimento}?establishmentId=${estabelecimento.idEstabelecimento}" class="text-white bg-gray-500 hover:bg-gray-600 rounded py-2 px-4">Ver Mais</a>
+                                ${type != 1 ? `<button class="text-white bg-orange-600 hover:bg-orange-700 rounded py-2 px-4" onclick="openRateModal('${estabelecimento.nomeEstabelecimento}', ${estabelecimento.idEstabelecimento})">Avaliar</button>` : ""}
+                            </div>
+                        </article>
+                    `;
+                    container.insertAdjacentHTML("beforeend", card);
+                });
+            };
+
+            const filterEstabelecimentos = (tipo, searchTerm = "") => {
+                let filteredEstabelecimentos = estabelecimentos;
+
+                if (searchTerm) {
+                    filteredEstabelecimentos = filteredEstabelecimentos.filter(
+                        (estabelecimento) =>
+                            estabelecimento.nomeEstabelecimento
+                                .toLowerCase()
+                                .includes(searchTerm),
+                    );
+                }
+
+                // Filtro por categoria
+                filteredEstabelecimentos = filteredEstabelecimentos.filter(
+                    (estabelecimento) =>
+                        estabelecimento.categoriaEstabelecimento ===
+                        selectedCategory,
+                );
+
+                // Filtro por tags
+                if (selectedTags.length > 0) {
+                    filteredEstabelecimentos = filteredEstabelecimentos.filter(
+                        (estabelecimento) =>
+                            estabelecimento.tagsEstabelecimento.some((tag) =>
+                                selectedTags.includes(tag.nomeTag),
+                            ),
+                    );
+                }
+
+                // Filtro por data de criação (novos estabelecimentos)
+                if (tipo === "new-business") {
+                    const today = new Date();
+                    filteredEstabelecimentos = filteredEstabelecimentos.filter(
+                        (estabelecimento) => {
+                            const dataCriacao = new Date(
+                                estabelecimento.dataCriacaoEstabelecimento,
+                            );
+                            const diffTime =
+                                today.getTime() - dataCriacao.getTime();
+                            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                            return diffDays <= 5;
+                        },
+                    );
+                }
+
+                if (tipo === "new-business") {
+                    renderEstabelecimentos(
+                        newBusinessContainer,
+                        filteredEstabelecimentos,
+                    );
+                } else {
+                    renderEstabelecimentos(
+                        allBusinessContainer,
+                        filteredEstabelecimentos,
+                    );
+                }
+            };
+
+            const radioButtons =
+                document.querySelectorAll('input[name="type"]');
+            radioButtons.forEach((radio) => {
+                radio.addEventListener("change", (e) => {
+                    const selectedType = (e.target as HTMLInputElement).id;
+                    if (selectedType === "new-business") {
+                        newBusinessContainer.style.display = "flex";
+                        allBusinessContainer.style.display = "none";
+                    } else {
+                        newBusinessContainer.style.display = "none";
+                        allBusinessContainer.style.display = "flex";
+                    }
+                    filterEstabelecimentos(selectedType, searchTerm);
+                });
+            });
+
+            const categoryRadios = document.querySelectorAll(
+                'input[name="categoria"]',
+            );
+            categoryRadios.forEach((radio) => {
+                radio.addEventListener("change", (e) => {
+                    selectedCategory = (
+                        e.target as HTMLInputElement
+                    ).value.toUpperCase();
+                    filterEstabelecimentos(selectedType, searchTerm);
+                });
+            });
+
+            document
+                .getElementById("input-search")
+                .addEventListener("input", (event) => {
+                    searchTerm = (
+                        event.target as HTMLInputElement
+                    ).value.toLowerCase();
+                    const selectedType = document.querySelector(
+                        'input[name="type"]:checked',
+                    ).id;
+                    filterEstabelecimentos(selectedType, searchTerm);
+                });
+
+            // Função para renderizar as tags selecionadas
+            const renderSelectedTags = () => {
+                searchedTagsContainer.innerHTML = "";
+
+                selectedTags.forEach((tag) => {
+                    const tagItem = document.createElement("li");
+                    tagItem.className =
+                        "tag-item flex items-center border border-gray-300 rounded-full px-3 py-1 m-1 hover:bg-orange-600 hover:text-white transition-colors";
+
+                    const tagName = document.createElement("span");
+                    tagName.textContent = tag;
+                    tagName.className = "mr-2";
+                    tagItem.appendChild(tagName);
+
+                    const deleteIcon = document.createElement("i");
+                    deleteIcon.className =
+                        "delete-icon cursor-pointer text-white";
+                    deleteIcon.innerText = "×";
+                    deleteIcon.addEventListener("click", () => removeTag(tag));
+                    tagItem.appendChild(deleteIcon);
+
+                    searchedTagsContainer.appendChild(tagItem);
+                });
+            };
+
+            const addTag = (tag) => {
+                if (tag && !selectedTags.includes(tag)) {
+                    selectedTags.push(tag);
+                    renderSelectedTags();
+                    filterEstabelecimentos(selectedCategory); // Aplica o filtro atualizado
+                }
+                (tagField as HTMLInputElement).value = ""; // Limpa o campo de entrada
+            };
+
+            const removeTag = (tag) => {
+                selectedTags = selectedTags.filter((t) => t !== tag);
+                renderSelectedTags();
+                filterEstabelecimentos(selectedCategory);
+            };
+
+            tagForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+                const tag = (tagField as HTMLInputElement).value.trim();
+                addTag(tag);
+            });
+
+            filterEstabelecimentos(selectedType);
+        } catch (error) {
+            console.error("Erro ao carregar os estabelecimentos:", error);
+        } finally {
+            document.getElementById("loading-screen").style.display = "none";
+        }
+    });
+
+    (window as any).openRateModal = (establishmentName, establishmentId) => {
+        // Update modal content with the establishment name and ID
+        document.getElementById("nome-estabelecimento").textContent =
+            establishmentName;
+        document.getElementById("rate-modal").dataset.establishmentId =
+            establishmentId;
+
+        // Show the modal
+        document.getElementById("rate-modal").classList.remove("hidden");
+    };
+
+    const convertToBase64 = (imageBlob) => {
+        return `data:image/png;base64,${imageBlob}`;
+    };
+</script>
+
+<style>
+    .filters {
+        @apply bg-gray-100 rounded-lg shadow-lg flex flex-col items-center p-3 max-w-72;
+    }
+
+    #input-search {
+        border-radius: 10px 0 0 10px;
+    }
+
+    #button-search {
+        border-radius: 0 10px 10px 0;
+        padding: 0.25rem;
+    }
+
+    input:checked#alimentacao ~ .alimentacao {
+        border-bottom: solid 3px rgb(var(--support-color));
+    }
+
+    input:checked#entretenimento ~ .entretenimento {
+        border-bottom: solid 3px rgb(var(--support-color));
+    }
+
+    input:checked#servicos ~ .servicos {
+        border-bottom: solid 3px rgb(var(--support-color));
+    }
+
+    /* Radio Buttons */
+    .radio {
+        @apply cursor-pointer w-full flex flex-grow items-center justify-center select-none font-semibold text-base py-2;
+        z-index: 10;
+        text-align: left;
+    }
+
+    .radio:hover {
+        color: rgb(var(--support-darkest-color));
+    }
+
+    .radio-container {
+        @apply flex w-full justify-evenly;
+    }
+
+    input:checked#all-business ~ .all-business {
+        border-bottom: solid 3px rgb(var(--support-color));
+    }
+
+    input:checked#new-business ~ .new-business {
+        border-bottom: solid 3px rgb(var(--support-color));
+    }
+
+    .business-container {
+        @apply flex flex-wrap p-5 text-center;
+    }
+</style>

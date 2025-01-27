@@ -1,0 +1,156 @@
+<article id="reserva-modal" class="hidden modal">
+  <div
+    class="modal-content bg-gray-100 rounded-lg shadow-lg flex flex-col items-center p-6"
+  >
+    <h2 class="font-bold text-2xl mb-4" id="titulo-reserva">Fazer Reserva</h2>
+    <form id="reserva-form" class="w-full flex flex-col items-center">
+      <!-- Campo para selecionar a data -->
+      <label for="reserva-data" class="font-medium mb-2">Data:</label>
+      <input
+        type="date"
+        id="reserva-data"
+        class="mb-4 p-2 border border-gray-300 rounded w-3/4"
+        required
+      />
+
+      <!-- Campo para selecionar o horário -->
+      <label for="reserva-horario" class="font-medium mb-2">Horário:</label>
+      <input
+        type="time"
+        id="reserva-horario"
+        class="mb-4 p-2 border border-gray-300 rounded w-3/4"
+        required
+      />
+
+      <!-- Botões de ação -->
+      <div class="flex flex-wrap justify-between mt-3 w-full px-10">
+        <button
+          id="cancel-reserva"
+          type="button"
+          class="rounded p-2 text-white bg-gray-600 hover:bg-gray-700"
+        >
+          Cancelar
+        </button>
+        <button
+          id="confirm-reserva"
+          type="submit"
+          class="rounded p-2 text-white bg-orange-600 hover:bg-orange-700"
+        >
+          Confirmar Reserva
+        </button>
+      </div>
+    </form>
+  </div>
+</article>
+
+<style>
+  @import "@assets/styles/modal-stylish.css";
+</style>
+
+<script>
+  import { jwtDecode } from "jwt-decode";
+  import Cookies from "js-cookie";
+
+  const apiUrl = import.meta.env.PUBLIC_API_URL;
+
+  // Função para fechar o modal de reservas
+  const closeReservaModal = () => {
+    const reservaModal = document.getElementById("reserva-modal");
+    if (reservaModal) {
+      reservaModal.classList.add("hidden"); // Oculta o modal
+    }
+
+    // Limpa os campos do formulário
+    (document.getElementById("reserva-data") as HTMLInputElement).value = "";
+    (document.getElementById("reserva-horario") as HTMLInputElement).value = "";
+  };
+
+  // Adiciona evento ao botão de cancelar
+  document
+    .getElementById("cancel-reserva")
+    ?.addEventListener("click", closeReservaModal);
+
+  // Impede a seleção de datas anteriores ao dia atual
+  const reservaDataInput = document.getElementById(
+    "reserva-data",
+  ) as HTMLInputElement;
+  if (reservaDataInput) {
+    const today = new Date().toISOString().split("T")[0];
+    reservaDataInput.setAttribute("min", today);
+  }
+
+  // Lógica para envio do formulário de reserva
+  const reservaForm = document.getElementById("reserva-form");
+  if (reservaForm) {
+    reservaForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      // Obtém os valores do formulário
+      const reservaData = (
+        document.getElementById("reserva-data") as HTMLInputElement
+      ).value;
+      const reservaHorario = (
+        document.getElementById("reserva-horario") as HTMLInputElement
+      ).value;
+
+      if (!reservaData || !reservaHorario) {
+        console.error("Todos os campos são obrigatórios!");
+        return;
+      }
+
+      // Cria a variável dataHoraReserva no formato localDateTime do Java
+      const dataReserva = `${reservaData}T${reservaHorario}`;
+
+      // Simulação de envio ao backend
+      const token = Cookies.get("token");
+
+      interface JwtPayload {
+        type: number;
+        sub: string;
+        iat: number;
+        exp: number;
+        id: number;
+      }
+
+      const decodedToken: JwtPayload = jwtDecode(token);
+      const idAvaliador = decodedToken.id;
+      const idEstabelecimento =
+        +document.getElementById("reserva-modal").dataset.establishmentId;
+      const idMesa = +document.getElementById("reserva-modal").dataset.tableId;
+
+      try {
+        const response = await fetch(`${apiUrl}/reserva/cadastro`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            idAvaliador,
+            idEstabelecimento,
+            idMesa,
+            dataReserva,
+          }),
+        });
+
+        if (!response.ok) {
+          if (response.status === 409) {
+            // Trata o status 409 - Conflito
+            alert("Horário indisponível! Por favor, selecione outro horário.");
+          } else {
+            // Trata outros tipos de erro
+            throw new Error(`Erro inesperado: ${response.status}`);
+          }
+          return;
+        }
+
+        console.log(`Reserva feita para ${reservaData} às ${reservaHorario}`);
+
+        // Fecha o modal após o envio
+        closeReservaModal();
+      } catch (error) {
+        console.error("Erro ao processar a reserva", error);
+      }
+    });
+  }
+</script>

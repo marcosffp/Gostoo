@@ -1,0 +1,332 @@
+<style>
+  @import "@assets/styles/modal-stylish.css";
+
+  .stars {
+    display: flex;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  .star {
+    font-size: 30px;
+    color: #ccc;
+  }
+
+  .star.selected {
+    color: gold;
+  }
+
+  .image-upload-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .image-upload-box {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f4f4f4;
+    cursor: pointer;
+  }
+
+  .image-upload-box .plus-sign {
+    font-size: 30px;
+    color: #aaa;
+  }
+
+  .image-upload-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .image-upload-box input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  textarea {
+    border: solid #a7a6a6 1px;
+    border-radius: 10px;
+    padding-left: 20px;
+    padding-top: 10px;
+    @apply w-full;
+  }
+</style>
+
+<article class="modal hidden" id="rate-modal">
+  <div
+    class="modal-content bg-gray-100 rounded-lg shadow-lg flex flex-col items-center"
+  >
+    <h2>
+      <span class="font-bold text-xl" id="nome-estabelecimento"
+        >Nome do Estabelecimento</span
+      >
+    </h2>
+    <div class="stars" id="star-rating">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
+    </div>
+    <form id="rate-form">
+      <textarea
+        maxlength="255"
+        placeholder="Escreva aqui sua avaliação em até 255 caracteres"
+        id="descricao-avaliacao"
+        required></textarea>
+      <div>
+        <div class="image-upload-container" id="image-upload-container">
+          <label class="image-upload-box" for="image-upload-1">
+            <span class="plus-sign">+</span>
+            <input
+              type="file"
+              id="image-upload-1"
+              class="image-upload"
+              accept="image/*"
+            />
+            <img id="img1" style="display: none;" />
+          </label>
+          <label class="image-upload-box" for="image-upload-2">
+            <span class="plus-sign">+</span>
+            <input
+              type="file"
+              id="image-upload-2"
+              class="image-upload"
+              accept="image/*"
+            />
+            <img id="img2" style="display: none;" />
+          </label>
+          <label class="image-upload-box" for="image-upload-3">
+            <span class="plus-sign">+</span>
+            <input
+              type="file"
+              id="image-upload-3"
+              class="image-upload"
+              accept="image/*"
+            />
+            <img id="img3" style="display: none;" />
+          </label>
+          <label class="image-upload-box" for="image-upload-4">
+            <span class="plus-sign">+</span>
+            <input
+              type="file"
+              id="image-upload-4"
+              class="image-upload"
+              accept="image/*"
+            />
+            <img id="img4" style="display: none;" />
+          </label>
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-between mt-3">
+        <button
+          class="rounded p-2 text-white bg-gray-600 hover:bg-gray-700"
+          type="button"
+          id="close-rate-modal">Cancelar</button
+        >
+        <button
+          class="rounded p-2 text-white bg-orange-600 hover:bg-orange-700"
+          type="submit">Enviar</button
+        >
+      </div>
+    </form>
+  </div>
+</article>
+
+<script>
+  import { jwtDecode } from "jwt-decode";
+  import Cookies from "js-cookie";
+  const apiUrl = import.meta.env.PUBLIC_API_URL;
+
+  let rating = 0;
+  const feedbackTextarea = document.getElementById(
+    "descricao-avaliacao",
+  ) as HTMLInputElement;
+  const stars = document.querySelectorAll(".star");
+  const plusSigns = document.querySelectorAll(".plus-sign");
+  const imageUploads = document.querySelectorAll(
+    ".image-upload",
+  ) as NodeListOf<HTMLInputElement>;
+  const imageSlots = ["img1", "img2", "img3", "img4"];
+
+  // Verifica a seleção das estrelas
+  stars.forEach((star) => {
+    star.addEventListener("click", () => {
+      rating = Number(star.getAttribute("data-value"));
+      stars.forEach((s) => {
+        s.classList.remove("selected");
+        if (Number(s.getAttribute("data-value")) <= rating) {
+          s.classList.add("selected");
+        }
+      });
+    });
+  });
+
+  // Função para atualizar a pré-visualização da imagem
+  imageUploads.forEach((input, index) => {
+    input.addEventListener("change", () => {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const imgSlot = document.getElementById(
+            imageSlots[index],
+          ) as HTMLImageElement;
+          const plusSign = plusSigns[index] as HTMLElement;
+
+          if (imgSlot) {
+            imgSlot.src = e.target.result as string;
+            imgSlot.style.display = "block"; // Exibe a imagem
+
+            if (plusSign) {
+              plusSign.style.display = "none"; // Esconde o sinal de +
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+
+  // Função para fechar o modal e resetar os campos
+  const handleClose = () => {
+    const rateModal = document.getElementById("rate-modal");
+    if (rateModal) {
+      rateModal.classList.add("hidden");
+    }
+
+    // Limpa os campos de avaliação
+    if (feedbackTextarea) {
+      feedbackTextarea.value = "";
+    }
+    rating = 0;
+    stars.forEach((s) => s.classList.remove("selected"));
+
+    // Limpa a pré-visualização das imagens
+    imageSlots.forEach((slot, index) => {
+      const imgElement = document.getElementById(slot) as HTMLImageElement;
+      const plusSign = plusSigns[index] as HTMLElement;
+      if (imgElement) {
+        imgElement.src = "";
+        imgElement.style.display = "none";
+
+        if (plusSign) {
+          plusSign.style.display = "block";
+        }
+      }
+    });
+
+    imageUploads.forEach((input) => {
+      input.value = ""; // Limpa os inputs de imagem
+    });
+  };
+
+  // Adiciona o evento de fechamento do modal
+  const closeModalButton = document.getElementById("close-rate-modal");
+  if (closeModalButton) {
+    closeModalButton.addEventListener("click", handleClose);
+  }
+
+  const parseToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string); // Garantindo que o resultado é string
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Envio do formulário
+  const rateForm = document.getElementById("rate-form");
+  if (rateForm) {
+    rateForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const feedback = feedbackTextarea.value;
+
+      const token = Cookies.get("token");
+
+      interface JwtPayload {
+        type: number;
+        sub: string;
+        iat: number;
+        exp: number;
+        id: number;
+      }
+
+      const decodedToken: JwtPayload = jwtDecode(token);
+      const idAvaliador = decodedToken.id;
+      const establishmentId =
+        +document.getElementById("rate-modal").dataset.establishmentId;
+
+      try {
+        // Envia a avaliação
+        const response = await fetch(`${apiUrl}/avaliacao/cadastro`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            idAvaliador: idAvaliador,
+            idEstabelecimento: establishmentId,
+            notaAvaliacao: rating,
+            descricaoAvaliacao: feedback,
+            dataAvaliacao: new Date().toISOString().split("T")[0],
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao enviar avaliação");
+        }
+
+        const data = await response.json();
+        const idAvaliacao = data.idAvaliacao;
+
+        // Agora, envia as imagens após a avaliação ser registrada
+        for (const input of imageUploads) {
+          const file = input.files[0];
+
+          if (file) {
+            // Aguarde a leitura do arquivo antes de enviar
+            const base64 = await parseToBase64(file);
+            const image = base64.replace(/^data:image\/[a-z]+;base64,/, "");
+
+            // Envia a imagem
+            const imageResponse = await fetch(
+              `${apiUrl}/avaliacao/${idAvaliacao}/imagens`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  imagem: image,
+                }),
+              },
+            );
+
+            if (!imageResponse.ok) {
+              throw new Error("Erro ao enviar imagem");
+            }
+          }
+        }
+
+        location.reload();
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+</script>

@@ -1,0 +1,157 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Logo from "../components/Logo.astro";
+import { Icon } from "astro-icon/components";
+import ModalAlert from "../components/ModalAlert.astro";
+---
+
+<Layout title="Gostô? - Login">
+  <main>
+    <Logo />
+    <article>
+      <h1>Faça seu Login no <span>Gostô?</span></h1>
+      <form>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Email"
+          required
+        />
+        <div class="input-password-container">
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Senha"
+            required
+          />
+          <button
+            type="button"
+            class="toggle-password bg-orange-600 hover:bg-orange-700"
+          >
+            <Icon name="solar:eye-outline" class="icon" />
+          </button>
+        </div>
+        <input type="submit" id="login-btn" value="Login" />
+      </form>
+      <p>Ainda não tem uma conta? <a href="cadastro">Cadastre-se já!</a></p>
+    </article>
+  </main>
+
+  <!-- Modal de Erro -->
+  <ModalAlert message="" />
+</Layout>
+
+<script>
+  import Cookies from "js-cookie"; // Importando js-cookie
+  import { jwtDecode } from "jwt-decode";
+  const apiUrl = import.meta.env.PUBLIC_API_URL;
+
+  document.querySelector("form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    login();
+  });
+
+  function showErrorModal(message) {
+    const errorMessageElement = document.getElementById("error-message");
+    errorMessageElement.textContent = message;
+    document.getElementById("error-modal").classList.remove("hidden");
+  }
+
+  async function login() {
+    const email = (document.getElementById("email") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement)
+      .value;
+
+    try {
+      const response = await fetch(`${apiUrl}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          senha: password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const token = data.token;
+
+        // Decodificar o token JWT para obter o campo de expiração (exp)
+        const decodedToken = jwtDecode(token);
+        const exp = decodedToken.exp;
+
+        // Converter 'exp' (em segundos) para milissegundos e criar um objeto Date
+        const expDate = new Date(exp * 1000);
+
+        Cookies.set("token", token, { expires: expDate, secure: true });
+
+        showErrorModal("Login bem-sucedido!");
+        window.location.href = "/descubra";
+      } else {
+        const errorText = await response.text();
+        showErrorModal(`Erro no login: ${errorText}`);
+      }
+    } catch (error) {
+      showErrorModal(`Erro de rede: ${error.message}`);
+    }
+  }
+
+  const togglePasswordButtons = document.querySelectorAll(".toggle-password");
+
+  togglePasswordButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      const passwordInput = button.previousElementSibling as HTMLInputElement;
+      const icon = button.querySelector(".icon");
+
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        icon.setAttribute("name", "solar:eye-closed-outline");
+      } else {
+        passwordInput.type = "password";
+        icon.setAttribute("name", "solar:eye-outline");
+      }
+    });
+  });
+
+  // Fechar modal de erro
+  document.getElementById("close-modal").addEventListener("click", function () {
+    document.getElementById("error-modal").classList.add("hidden");
+  });
+</script>
+
+<style>
+  @import "../assets/styles/auth-stylish.css";
+
+  .input-password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  #password {
+    padding-right: 40px; /* Espaço para o botão */
+    border-radius: 10px 0 0 10px;
+    flex-grow: 1;
+  }
+
+  .toggle-password {
+    right: 10px;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 10px 10px 0;
+  }
+
+  .toggle-password .icon {
+    width: 20px;
+    color: aliceblue;
+    height: 40px; /* Define a altura do botão igual ao campo de senha */
+  }
+</style>

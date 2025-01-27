@@ -1,0 +1,112 @@
+@import "/src/assets/styles/logo-stylish.css";
+
+main {
+    display: grid;
+    grid-template-columns: 65% 35%;
+    padding: 0;
+    height: 100dvh;
+}
+
+article {
+    padding: 20% 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    overflow-y: scroll;
+}
+
+article h1 {
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+article h1 span {
+    color: rgb(var(--support-color));
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#reset-pwd {
+    text-align: right;
+}
+
+#reset-pwd:hover {
+    color: rgb(var(--support-darkest-color));
+}
+
+input:not([type="radio"], [type="file"]), textarea, select {
+    height: 50px;
+    border: solid #a7a6a6 1px;
+    border-radius: 10px;
+    padding-left: 20px;
+}
+
+/* Botão de Login */
+input[type="submit"] {
+    background-color: rgb(var(--support-color));
+    color: rgb(var(--second-color));
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: rgb(var(--support-darkest-color));
+}
+
+/* Radio Buttons */
+.radio {
+    @apply cursor-pointer w-1/6 flex items-center justify-center uppercase select-none font-semibold text-lg py-2;
+    z-index: 10;
+    text-align: center;
+}
+
+.radio:hover {
+    color: rgb(var(--support-darkest-color));
+}
+
+.radio-container {
+    @apply flex w-full justify-evenly relative;
+}
+
+input:checked#business ~ .business {
+    border-bottom: solid 3px rgb(var(--support-color));
+}
+
+input:checked#reviewer ~ .reviewer {
+    border-bottom: solid 3px rgb(var(--support-color));
+}
+
+/* Estilos para os links */
+p > a {
+    color: rgb(var(--support-color));
+}
+
+p > a:hover {
+    color: rgb(var(--support-darkest-color));
+}
+
+@media (max-width: 1200px) {
+    main {
+        grid-template-columns: 50% 50%;
+    }
+}
+
+@media (max-width: 1000px) {
+    main {
+        grid-template-columns: 100%;
+        overflow-y: scroll;
+    }
+
+    article {
+        overflow-y: visible;
+        padding: 10%;
+    }
+
+    .radio-container {
+        flex-direction: column !important;
+        align-items: center;
+    }
+}

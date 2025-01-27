@@ -1,0 +1,33 @@
+{
+  "name": "gostoo",
+  "type": "module",
+  "version": "1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/tailwind": "^5.1.2",
+    "@iconify-json/basil": "^1.2.1",
+    "@iconify-json/hugeicons": "^1.2.1",
+    "@iconify-json/mdi": "^1.1.68",
+    "@iconify-json/mingcute": "^1.2.1",
+    "@iconify-json/solar": "^1.2.1",
+    "@iconify-json/streamline": "^1.1.9",
+    "astro": "^4.14.2",
+    "astro-icon": "^1.1.1",
+    "bcryptjs": "^2.4.3",
+    "chart.js": "^4.4.7",
+    "gostoo": "file:",
+    "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
+    "pale-parsec": "file:",
+    "tailwindcss": "^3.4.13"
+  },
+  "devDependencies": {
+    "vite": "^6.0.3"
+  }
+}

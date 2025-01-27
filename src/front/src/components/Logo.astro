@@ -1,0 +1,55 @@
+<div class="logo-container" id="logo-container">
+  <div class="glass-container">
+    <h1 class="main-logo">Gostô?</h1>
+    <h2 class="main-slogan">
+      Provô. Gostô? Postô!
+    </h2>
+  </div>
+</div>
+
+<script>
+  const container = document.getElementById("logo-container");
+  const mainLogo = document.querySelector(".main-logo");
+
+  // Array de URLs de imagens
+  const images = [
+    "0.jpg",
+    "1.jpg",
+    "2.jpg",
+    "3.jpg",
+    "4.jpg",
+    "5.jpg",
+    "6.jpg",
+    "8.jpg",
+    "9.jpg"
+  ];
+
+  // Função para trocar o fundo
+  function changeBackground() {
+    const randomIndex = Math.floor(Math.random() * images.length);
+    const selectedImage = images[randomIndex];
+    container.style.backgroundImage = `url("/background/${selectedImage}")`;
+    container.style.backgroundSize = 'cover';
+    container.style.backgroundRepeat = 'no-repeat';
+    container.style.backgroundPosition = 'center';
+  }
+
+  // Troca o fundo imediatamente ao carregar a página
+  changeBackground();
+
+  // Configura o intervalo para trocar o fundo a cada 10 segundos
+  setInterval(changeBackground, 10 * 1000);
+
+  // Verifica o caminho da URL
+  const path = window.location.pathname;
+  if (path === "/login" || path === "/cadastro") {
+    (mainLogo as HTMLElement).style.cursor = "default"; 
+    mainLogo.addEventListener("click", () => {
+      window.location.href = "/";  // Redireciona para a homepage
+    });
+  }
+</script>
+
+<style>
+  @import "/src/assets/styles/logo-stylish.css";
+</style>

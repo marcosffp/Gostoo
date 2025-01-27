@@ -1,0 +1,34 @@
+cff-version: 1.0.1
+message: Please cite this software using these metadata.
+title: Gostô?
+authors:
+  - family-names: Souza Alvim
+    given-names: Bernardo
+  - family-names: Alberto Ferreira
+    given-names: Marcos 
+  - family-names: Alvarenga Cardoso 
+    given-names: Gabriela 
+  - family-names: Paulo Fonseca Elias
+    given-names: João 
+  - family-names: Marques Ribeiro Fonseca
+    given-names: Athos 
+  - family-names: Oliveira Jardim
+    given-names: Luísa 
+  - name-suffix: Professora
+    affiliation: PUC Minas
+    family-names: Alonso Veloso
+    given-names: Eveline 
+  - name-suffix: Professora
+    affiliation: PUC Minas
+    family-names: Baroni de Carvalho
+    given-names: Juliana Amaral 
+  - name-suffix: Professora
+    affiliation: PUC Minas
+    family-names: Ribeiro De Souza
+    given-names: Joana Gabriela
+keywords:
+  - review
+repository-code: https://github.com/ICEI-PUC-Minas-PPLES-TI/plf-es-2024-2-ti2-1372100-gostoo/
+license: CC-BY-4.0
+version: 1.0.0
+date-released: 2024-12-12

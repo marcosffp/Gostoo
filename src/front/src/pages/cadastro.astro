@@ -1,0 +1,508 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Logo from "../components/Logo.astro";
+import { Icon } from "astro-icon/components";
+import Footer from "../components/Footer.astro";
+import ModalAlert from "../components/ModalAlert.astro";
+---
+
+<Layout title="Gostô? - Cadastro">
+   <main>
+      <Logo />
+      <article>
+         <h1>Cadastre-se no <span>Gostô?</span>!</h1>
+
+         <div class="radio-container">
+            <input
+               type="radio"
+               id="business"
+               name="type"
+               class="appearance-none peer/business"
+            />
+            <label for="business" class="radio business">Estabelecimento</label>
+
+            <input
+               type="radio"
+               id="reviewer"
+               name="type"
+               class="appearance-none peer/reviewer"
+               checked
+            />
+            <label for="reviewer" class="radio reviewer">Avaliador</label>
+         </div>
+
+         <!-- Formulário para Estabelecimento -->
+         <form id="form-estabelecimento" style="display:none;">
+            <input
+               type="text"
+               name="name"
+               id="name-estabelecimento"
+               placeholder="Nome do Estabelecimento"
+               required
+            />
+            <input
+               type="text"
+               name="regiao"
+               id="regiao"
+               placeholder="Região"
+               required
+            />
+            <input
+               type="text"
+               name="bairro"
+               id="bairro"
+               placeholder="Bairro"
+               required
+            />
+            <input type="text" name="rua" id="rua" placeholder="Rua" required />
+            <input
+               type="text"
+               name="numero"
+               id="numero"
+               placeholder="Número"
+               required
+            />
+            <input
+               type="text"
+               name="acrescimos"
+               id="acrescimos"
+               placeholder="Acréscimos (opcional)"
+            />
+            <input
+               type="tel"
+               name="tel"
+               id="tel-estabelecimento"
+               placeholder="Telefone do Estabelecimento"
+               required
+            />
+            <input
+               type="email"
+               name="email"
+               id="email-estabelecimento"
+               placeholder="Email"
+               required
+            />
+            <select name="category" id="category" required>
+               <option value="" disabled selected>Escolha uma opção</option>
+               <option value="alimentacao">ALIMENTACAO</option>
+               <option value="entretenimento">ENTRETENIMENTO</option>
+               <option value="servicos">SERVICOS</option>
+            </select>
+            <textarea
+               class="pt-3"
+               name="descricao"
+               id="descricao"
+               maxlength="200"
+               placeholder="Descrição"
+               required></textarea>
+            <div class="input-password-container">
+               <input
+                  type="password"
+                  name="senha"
+                  id="senha-estabelecimento"
+                  placeholder="A senha deve ter 6 letras, uma letra maiúscula, uma letra minúscula, um especial e um número"
+                  required
+               />
+               <button
+                  type="button"
+                  class="toggle-password bg-orange-600 hover:bg-orange-700"
+               >
+                  <Icon name="solar:eye-outline" class="icon" />
+               </button>
+            </div>
+            <input
+               type="submit"
+               value="Cadastre-se"
+               id="register-estabelecimento"
+            />
+         </form>
+
+         <!-- Formulário para Avaliador -->
+         <form id="form-avaliador">
+            <input
+               type="text"
+               name="nome"
+               id="nome"
+               placeholder="Nome"
+               required
+            />
+            <input
+               type="tel"
+               name="telefone"
+               id="telefone"
+               placeholder="Telefone"
+               required
+            />
+            <input
+               type="email"
+               name="email"
+               id="email"
+               placeholder="Email"
+               required
+            />
+            <input
+               type="date"
+               name="dataNascimento"
+               id="dataNascimento"
+               required
+            />
+            <div class="input-password-container">
+               <input
+                  type="password"
+                  name="senha"
+                  id="senha-avaliador"
+                  placeholder="A senha deve ter 6 letras, uma letra maiúscula, uma letra minúscula, um especial e um número"
+                  required
+               />
+               <button
+                  type="button"
+                  class="toggle-password bg-orange-600 hover:bg-orange-700"
+               >
+                  <Icon name="solar:eye-outline" class="icon" />
+               </button>
+            </div>
+            <input type="submit" value="Cadastre-se" id="register-avaliador" />
+         </form>
+
+         <p>Já possui conta? <a href="login">Faça seu login!</a></p>
+      </article>
+   </main>
+
+   <!-- Modal de Erro -->
+   <ModalAlert message="" />
+</Layout>
+
+<script>
+   import Cookies from "js-cookie";
+
+   const apiUrl = import.meta.env.PUBLIC_API_URL;
+   console.log(apiUrl);
+
+   // Função para validar a senha em tempo real com ícones de validação
+   function validarSenha(senha) {
+      // Requisitos de senha
+      const minLength = senha.length >= 6;
+      const hasNumber = /[0-9]/.test(senha);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(senha);
+      const hasUppercase = /[A-Z]/.test(senha);
+      const hasLowercase = /[a-z]/.test(senha);
+
+      return (
+         minLength &&
+         hasLowercase &&
+         hasUppercase &&
+         hasNumber &&
+         hasSpecialChar
+      );
+   }
+
+   let isSubmitting = false;
+
+   function validarTelefone(telefone: string): boolean {
+      const apenasNumeros = telefone.replace(/\D/g, "");
+      return apenasNumeros.length === 10 || apenasNumeros.length === 11;
+   }
+
+   function validarDataNascimento(dataNascimento: string): boolean {
+      const dataInserida = new Date(dataNascimento);
+      const dataAtual = new Date();
+      dataAtual.setHours(0, 0, 0, 0); // Zera horas para comparações
+      return !isNaN(dataInserida.getTime()) && dataInserida < dataAtual;
+   }
+
+   document.addEventListener("DOMContentLoaded", function () {
+      const formEstabelecimento = document.getElementById(
+         "form-estabelecimento",
+      );
+      const formAvaliador = document.getElementById("form-avaliador");
+
+      const radioBusiness = document.getElementById(
+         "business",
+      ) as HTMLInputElement;
+      const radioReviewer = document.getElementById(
+         "reviewer",
+      ) as HTMLInputElement;
+
+      // Adiciona eventos para mudar os formulários
+      radioBusiness.addEventListener("change", function () {
+         if (radioBusiness.checked) {
+            formEstabelecimento.style.display = "flex";
+            formAvaliador.style.display = "none";
+         }
+      });
+
+      radioReviewer.addEventListener("change", function () {
+         if (radioReviewer.checked) {
+            formEstabelecimento.style.display = "none";
+            formAvaliador.style.display = "flex";
+         }
+      });
+
+      // Evento de submit para o formulário de Avaliador
+      formAvaliador.addEventListener("submit", function (event) {
+         event.preventDefault(); // Impede a submissão tradicional do formulário
+         if (!isSubmitting) registerAvaliador();
+      });
+
+      // Evento de submit para o formulário de Estabelecimento
+      formEstabelecimento.addEventListener("submit", function (event) {
+         event.preventDefault(); // Impede a submissão tradicional do formulário
+         if (!isSubmitting) registerEstabelecimento();
+      });
+
+      const togglePasswordButtons =
+         document.querySelectorAll(".toggle-password");
+
+      togglePasswordButtons.forEach((button) => {
+         button.addEventListener("click", function () {
+            const passwordInput =
+               button.previousElementSibling as HTMLInputElement;
+            const icon = button.querySelector(".icon");
+
+            if (passwordInput.type === "password") {
+               passwordInput.type = "text";
+               icon.setAttribute("name", "solar:eye-closed-outline");
+            } else {
+               passwordInput.type = "password";
+               icon.setAttribute("name", "solar:eye-outline");
+            }
+         });
+      });
+
+      // Fechar modal de erro
+      document
+         .getElementById("close-modal")
+         .addEventListener("click", function () {
+            document.getElementById("error-modal").classList.add("hidden");
+         });
+   });
+
+   function showErrorModal(message) {
+      const errorMessageElement = document.getElementById("error-message");
+      errorMessageElement.textContent = message;
+      document.getElementById("error-modal").classList.remove("hidden");
+   }
+
+   // Função de cadastro para Avaliador
+   async function registerAvaliador() {
+      isSubmitting = true;
+      (
+         document.getElementById("register-avaliador") as HTMLInputElement
+      ).disabled = true;
+
+      const nome = (document.getElementById("nome") as HTMLInputElement).value;
+      const email = (document.getElementById("email") as HTMLInputElement)
+         .value;
+      const telefone = (document.getElementById("telefone") as HTMLInputElement)
+         .value;
+      const dataNascimento = (
+         document.getElementById("dataNascimento") as HTMLInputElement
+      ).value;
+      const senha = (
+         document.getElementById("senha-avaliador") as HTMLInputElement
+      ).value;
+
+      if (!validarTelefone(telefone)) {
+         isSubmitting = false;
+         (
+            document.getElementById("register-avaliador") as HTMLInputElement
+         ).disabled = false;
+         return showErrorModal("Campo Telefone deve ter 10 ou 11 dígitos.");
+      }
+
+      if (!validarDataNascimento(dataNascimento)) {
+         isSubmitting = false;
+         (
+            document.getElementById("register-avaliador") as HTMLInputElement
+         ).disabled = false;
+         return showErrorModal(
+            "Campo Data de Nascimento deve ser uma data no futuro.",
+         );
+      }
+
+      if (!validarSenha(senha)) {
+         isSubmitting = false;
+         (
+            document.getElementById("register-avaliador") as HTMLInputElement
+         ).disabled = false;
+         return showErrorModal(
+            "A senha deve conter 6 letras, uma letra maiúscula, uma letra minúscula, um especial e um número",
+         );
+      }
+      console.log(`${apiUrl}/avaliador/cadastro`);
+
+      try {
+         const response = await fetch(`${apiUrl}/avaliador/cadastro`, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+               nomeAvaliador: nome,
+               emailAvaliador: email,
+               telefoneAvaliador: telefone,
+               dataNascimentoAvaliador: dataNascimento,
+               senhaAvaliador: senha,
+            }),
+         });
+
+         if (response.ok) {
+            showErrorModal("Cadastro realizado com sucesso!");
+            Cookies.set("token", (await response.json()).token);
+            window.location.href = "/descubra";
+         } else {
+            const errorText = await response.text();
+            showErrorModal(`Erro ao cadastrar: ${errorText}`);
+         }
+      } catch (error) {
+         showErrorModal(`Erro de rede: ${error.message}`);
+      } finally {
+         isSubmitting = false;
+         (
+            document.getElementById("register-avaliador") as HTMLInputElement
+         ).disabled = false;
+      }
+   }
+
+   // Função de cadastro para Estabelecimento
+   async function registerEstabelecimento() {
+      isSubmitting = true;
+      (
+         document.getElementById("register-estabelecimento") as HTMLInputElement
+      ).disabled = true;
+
+      const nome = (
+         document.getElementById("name-estabelecimento") as HTMLInputElement
+      ).value;
+      const email = (
+         document.getElementById("email-estabelecimento") as HTMLInputElement
+      ).value;
+      const telefone = (
+         document.getElementById("tel-estabelecimento") as HTMLInputElement
+      ).value;
+
+      const regiao = (document.getElementById("regiao") as HTMLInputElement)
+         .value;
+      const bairro = (document.getElementById("bairro") as HTMLInputElement)
+         .value;
+      const rua = (document.getElementById("rua") as HTMLInputElement).value;
+      const numero = (document.getElementById("numero") as HTMLInputElement)
+         .value;
+      const acrescimos = (
+         document.getElementById("acrescimos") as HTMLInputElement
+      ).value;
+
+      const localidade = `${regiao};${bairro};${rua};${numero};${acrescimos || " "}`;
+
+      const descricao = (
+         document.getElementById("descricao") as HTMLInputElement
+      ).value;
+      const senha = (
+         document.getElementById("senha-estabelecimento") as HTMLInputElement
+      ).value;
+      const categoria = document.getElementById(
+         "category",
+      ) as HTMLSelectElement;
+
+      if (!validarTelefone(telefone)) {
+         isSubmitting = false;
+         (
+            document.getElementById("register-avaliador") as HTMLInputElement
+         ).disabled = false;
+         return showErrorModal("Campo Telefone deve ter 10 ou 11 dígitos.");
+      }
+
+      if (!validarSenha(senha)) {
+         isSubmitting = false;
+         (
+            document.getElementById(
+               "register-estabelecimento",
+            ) as HTMLInputElement
+         ).disabled = false;
+         return showErrorModal(
+            "A senha deve conter 6 letras, uma letra maiúscula, uma letra minúscula, um especial e um número",
+         );
+      }
+
+      const dataCriacaoEstabelecimento = new Date();
+      dataCriacaoEstabelecimento.setDate(
+         dataCriacaoEstabelecimento.getDate() - 1,
+      );
+      const dataFormatada = dataCriacaoEstabelecimento
+         .toISOString()
+         .split("T")[0];
+
+      try {
+         const response = await fetch(`${apiUrl}/estabelecimento/cadastro`, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+               nomeEstabelecimento: nome,
+               emailEstabelecimento: email,
+               telefoneEstabelecimento: telefone,
+               localidadeEstabelecimento: localidade.toLocaleUpperCase(),
+               senhaEstabelecimento: senha,
+               descricaoEstabelecimento: descricao,
+               notaEstabelecimento: 0,
+               categoriaEstabelecimento:
+                  categoria.options[categoria.selectedIndex].text,
+               dataCriacaoEstabelecimento: dataFormatada,
+            }),
+         });
+
+         if (response.ok) {
+            showErrorModal("Cadastro realizado com sucesso!");
+            Cookies.set("token", (await response.json()).token);
+            window.location.href = "/descubra";
+         } else {
+            const errorText = await response.text();
+            showErrorModal(`Erro ao cadastrar: ${errorText}`);
+         }
+      } catch (error) {
+         showErrorModal(`Erro de rede: ${error.message}`);
+      } finally {
+         isSubmitting = false;
+         (
+            document.getElementById(
+               "register-estabelecimento",
+            ) as HTMLInputElement
+         ).disabled = false;
+      }
+   }
+</script>
+
+<style>
+   @import "../assets/styles/auth-stylish.css";
+
+   .input-password-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+   }
+
+   #senha-avaliador,
+   #senha-estabelecimento {
+      padding-right: 40px; /* Espaço para o botão */
+      border-radius: 10px 0 0 10px;
+      flex-grow: 1;
+   }
+
+   .toggle-password {
+      right: 10px;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 10px 10px 0;
+   }
+
+   .toggle-password .icon {
+      width: 20px;
+      color: aliceblue;
+      height: 40px; /* Define a altura do botão igual ao campo de senha */
+   }
+</style>

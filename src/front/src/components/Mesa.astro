@@ -1,0 +1,163 @@
+<style>
+  @import "@assets/styles/modal-stylish.css";
+
+  textarea,
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #a7a6a6;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+</style>
+
+<article class="modal hidden" id="table-modal">
+  <div
+    class="modal-content bg-gray-100 rounded-lg shadow-lg flex flex-col items-center"
+  >
+    <h2 class="font-bold text-xl mb-4" id="table-title">Adicionar Mesa</h2>
+    <form id="table-form">
+      <!-- Nome da mesa -->
+      <label for="nome-mesa">Nome da Mesa</label>
+      <input type="text" placeholder="Mesa 10" id="nome-mesa" required />
+
+      <!-- Descrição da mesa -->
+      <label for="descricao-mesa">Descrição da Mesa</label>
+      <textarea
+        maxlength="255"
+        placeholder="Escreva uma descrição para a mesa (até 255 caracteres)"
+        id="descricao-mesa"
+        required></textarea>
+
+      <!-- Capacidade da mesa -->
+      <label for="capacidade-mesa">Capacidade da Mesa</label>
+      <input
+        type="number"
+        id="capacidade-mesa"
+        placeholder="Informe a capacidade (número de lugares)"
+        min="1"
+        required
+      />
+
+      <div class="flex flex-wrap justify-between mt-3">
+        <button
+          class="rounded p-2 text-white bg-gray-600 hover:bg-gray-700"
+          type="button"
+          id="close-table-modal">Cancelar</button
+        >
+        <button
+          class="rounded p-2 text-white bg-orange-600 hover:bg-orange-700"
+          type="submit">Enviar</button
+        >
+      </div>
+    </form>
+  </div>
+</article>
+
+<script>
+  import Cookies from "js-cookie";
+
+  const token = Cookies.get("token");
+
+  const apiUrl = import.meta.env.PUBLIC_API_URL;
+
+  // Fechar modal e resetar campos
+  const handleClose = () => {
+    const tableModal = document.getElementById("table-modal");
+    if (tableModal) {
+      tableModal.classList.add("hidden");
+    }
+
+    // Limpa os campos de descrição e capacidade
+    (document.getElementById("nome-mesa") as HTMLInputElement).value = "";
+    (document.getElementById("descricao-mesa") as HTMLInputElement).value = "";
+    (document.getElementById("capacidade-mesa") as HTMLInputElement).value = "";
+  };
+
+  // Adiciona o evento de fechamento do modal
+  const closeModalButton = document.getElementById("close-table-modal");
+  if (closeModalButton) {
+    closeModalButton.addEventListener("click", handleClose);
+  }
+
+  // Envio do formulário de mesa
+  const tableForm = document.getElementById("table-form");
+  if (tableForm) {
+    tableForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const nomeMesa = (
+        document.getElementById("nome-mesa") as HTMLInputElement
+      ).value;
+      const descricaoMesa = (
+        document.getElementById("descricao-mesa") as HTMLInputElement
+      ).value;
+      const capacidadeMesa = parseInt(
+        (document.getElementById("capacidade-mesa") as HTMLInputElement).value,
+        10,
+      );
+
+      if (document.getElementById("table-modal").dataset.isEditing === "true")
+        putTable(nomeMesa, descricaoMesa, capacidadeMesa);
+      else postTable(nomeMesa, descricaoMesa, capacidadeMesa);
+    });
+  }
+
+  async function postTable(nomeMesa, descricaoMesa, capacidadeMesa) {
+    try {
+      // Envia os dados da mesa para o backend
+      const response = await fetch(`${apiUrl}/mesa/cadastro`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          nomeMesa: nomeMesa,
+          descricaoMesa: descricaoMesa,
+          capacidadeMesa: capacidadeMesa,
+          idEstabelecimento:
+            +document.getElementById("table-modal").dataset.establishmentId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao cadastrar mesa");
+      }
+
+      location.reload();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function putTable(nomeMesa, descricaoMesa, capacidadeMesa) {
+    const idMesa = +document.getElementById("table-id").textContent;
+
+    try {
+      // Envia os dados da mesa para o backend
+      const response = await fetch(`${apiUrl}/mesa/` + idMesa, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id: idMesa,
+          nome: nomeMesa,
+          descricao: descricaoMesa,
+          capacidade: capacidadeMesa,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao editar mesa");
+      }
+
+      location.reload();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+</script>

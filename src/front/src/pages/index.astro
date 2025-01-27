@@ -1,0 +1,184 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Logo from "../components/Logo.astro";
+
+import { Icon } from "astro-icon/components";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="Gostô? - Seu website de review">
+	<Header />
+	<Logo />
+	<main>
+		<section>
+			<h1>Bem vindo ao <span>Gostô?</span></h1>
+			<p>O melhor site de reviews da internet!</p>
+
+			<p class="copy">Bem-vindo ao "Gostô?", a plataforma que conecta você aos melhores estabelecimentos da sua cidade! Encontre restaurantes, bares, casas de shows e muito mais, tudo em um só lugar. Nosso objetivo é promover pequenos e médios negócios, ajudando você a descobrir novas experiências de lazer e gastronomia.</p>
+		</section>
+		<section class="whyUse">
+			<h2>Por que usar nosso app?</h2>
+			<ul>
+				<li>
+					<Icon 
+						name="streamline:money-graph-arrow-increase-ascend-growth-up-arrow-stats-graph-right-grow" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Visibilidade para Negócios Locais</h3>
+					<p>Pequenos e médios estabelecimentos ganham destaque, permitindo que você descubra lugares únicos que muitas vezes passam despercebidos.</p>
+				</li>
+				<li>
+					<Icon 
+						name="streamline:business-handshake-solid" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Avaliações Autênticas</h3>
+					<p>Confira as avaliações e opiniões de outros usuários para escolher os melhores locais com base em experiências reais.</p>
+				</li>
+				<li>
+					<Icon 
+						name="streamline:book-reading-solid" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Reservas Fáceis e Convenientes</h3>
+					<p>Faça reservas diretamente pela plataforma, sem complicações. Encontre o local perfeito e garanta seu lugar com apenas alguns cliques.</p>
+				</li>
+				<li>
+					<Icon 
+						name="streamline:magnifying-glass-solid" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Descoberta Personalizada</h3>
+					<p>Utilize nossas ferramentas de busca para encontrar exatamente o que você procura, seja um novo restaurante ou um evento especial na sua cidade.</p>
+				</li>
+			</ul>
+		</section>
+		<section class="howItWorks">
+			<h2>Como funciona?</h2>
+			<ul>
+				<li>
+					<Icon 
+						name="mdi:search-web" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Explore</h3>
+					<p>Navegue por categorias e descubra novos lugares para visitar.</p>
+				</li>
+				<li>
+					<Icon 
+						name="mdi:thumbs-up-down-outline" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Avalie</h3>
+					<p>Compartilhe suas experiências e ajude outros usuários a encontrarem os melhores estabelecimentos.</p>	
+				</li>
+				<li>
+					<Icon 
+						name="mdi:book-check-outline" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Reserve</h3>
+					<p>Faça reservas de forma rápida e simples, garantindo sua experiência sem stress.</p>
+				</li>
+				<li>
+					<Icon 
+						name="mdi:internet" 
+						size={60}
+						color="rgb(255, 84, 0)"
+						class="icon"
+					/>
+					<h3>Conecte-se</h3>
+					<p>Participe de uma comunidade engajada de exploradores urbanos, prontos para descobrir o melhor da gastronomia e entretenimento local.</p>
+				</li>
+			</ul>
+		</section>
+	</main>
+
+<Footer />
+</Layout>
+
+<style>
+	h1 {
+		font-size: 2.5rem;
+
+		& span {
+			color: rgb(var(--support-color));
+		}
+	}
+
+	h2 {
+		margin-bottom: 2rem;
+		font-size: 2rem;
+	}
+
+	p {
+		font-size: 1.3rem;
+	}
+
+	section {
+		margin-bottom: 2rem;
+	}
+
+	.copy {
+		margin-top: 1rem;
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		list-style: none;
+		justify-content: space-evenly;
+		gap: 10px;
+
+		& li {
+			flex-basis: 22%;
+			border-radius: 30px;
+			border: solid #2222223a .75px;
+			padding: 15px;
+
+			& 	h3 {
+				font-size: 1.1rem;
+				font-weight: 500;
+				margin-top: 10px;
+			}
+
+			& .icon {
+				margin: 0 auto;
+			}
+
+			& p {
+				margin-top: 10px;
+				font-size: 1rem;
+			}
+		}
+	}
+
+	@media (max-width: 1024px) {
+		ul li {
+			flex-basis: 45%;
+			max-width: 45%;
+		}
+	}
+
+	@media (max-width: 768px) {
+		ul li {
+			flex-basis: 100%;
+			max-width: 100%;
+		}
+	}
+</style>
