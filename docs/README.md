@@ -1,5 +1,8 @@
+<img width="1600" style="height:auto; border-radius: 12px;" alt="banner Gostô?" src="images/gosto-banner.png" />
+
 # Gostô?
 
+> Documentação acadêmica completa do projeto — contextualização, problema, participantes, sistemas concorrentes, modelagem dos processos de negócio, projeto da solução e indicadores de desempenho.
 
 **Bernardo Souza Alvim, bernardo.alvim@sga.pucminas.br**
 
@@ -43,6 +46,27 @@ Por fim, um dos objetivos centrais do projeto é **promover a cultura de Belo Ho
 
 ---
 
+## 📑 Sumário
+
+- [1. Introdução](#1-introdução)
+  - [1.1 Contextualização](#11-contextualização)
+  - [1.2 Problema](#12-problema)
+  - [1.3 Objetivo geral](#13-objetivo-geral)
+  - [1.4 Justificativas](#14-justificativas)
+- [2. Participantes do Processo](#2-participantes-do-processo)
+- [3. Situação Atual](#3-situação-atual)
+  - [3.1 Sistemas Existentes](#31-sistemas-existentes)
+  - [3.2 Processos Manuais Atuais](#32-processos-manuais-atuais)
+  - [3.2 Descrição Geral da Proposta de Solução](#32-descrição-geral-da-proposta-de-solução)
+  - [3.3 Modelagem dos processos](#33-modelagem-dos-processos)
+- [4. Projeto da solução](#4-projeto-da-solução)
+- [5. Indicadores de desempenho](#5-indicadores-de-desempenho)
+- [6. Interface do sistema](#6-interface-do-sistema)
+- [7. Conclusão](#7-conclusão)
+- [Referências](#referências)
+- [Apêndices](#apêndices)
+
+---
 
 ## 1. Introdução
 
@@ -339,13 +363,16 @@ _Atualizar os links e adicionar novos links para que a estrutura do código este
 
 ## Apêndice B - Apresentação final
 
-
 [Slides da apresentação final](presentations/)
-
 
 [Vídeo da apresentação final](video/)
 
+---
 
+<div align="center">
+  <img width="70%" alt="banner institucional PUC Minas" src="images/banner-institucional.svg"/>
+</div>
+<p align="center">Fonte do banner: <a href="https://github.com/joaopauloaramuni">João Paulo Carneiro Aramuni</a></p>
 
 
 
