@@ -4,6 +4,8 @@
 
 > Aplicação web do **Gostô?** — feita em Astro com Tailwind CSS, consome a API REST do backend para cadastro, login, descoberta de estabelecimentos, avaliações e reservas.
 
+🔗 **Deploy:** [gostoo.vercel.app](https://gostoo.vercel.app)
+
 ---
 
 ## 🛠️ Stack
@@ -73,7 +75,7 @@ Crie um arquivo `.env` na raiz de `src/front/` com:
 PUBLIC_API_URL="http://localhost:8080"
 ```
 
-> Use a URL do backend hospedado (ex.: `https://gostoservice.onrender.com`) ou do backend local (`http://localhost:8080`), conforme o ambiente desejado — veja o [README raiz](../../README.md#-instalação-e-execução).
+> Use a URL do backend hospedado (ex.: `https://gostoo-36vv.onrender.com`) ou do backend local (`http://localhost:8080`), conforme o ambiente desejado — veja o [README raiz](../../README.md#-instalação-e-execução).
 
 ## 🚀 Instalação e execução
 

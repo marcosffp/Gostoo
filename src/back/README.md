@@ -4,6 +4,8 @@
 
 > API REST do **Gostô?** — autenticação JWT, cadastro de avaliadores e estabelecimentos, avaliações com fotos, gestão de mesas e reservas, persistidos em MySQL via Spring Data JPA.
 
+🔗 **Deploy:** [gostoo-36vv.onrender.com](https://gostoo-36vv.onrender.com)
+
 ---
 
 ## 🛠️ Stack
