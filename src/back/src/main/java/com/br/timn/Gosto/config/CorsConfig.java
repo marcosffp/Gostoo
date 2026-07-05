@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
+                        .allowedOrigins("https://gostoo.vercel.app", "http://localhost:4321")
                         .allowedHeaders("*")
                         .allowedMethods("GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS");
             }
