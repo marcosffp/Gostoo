@@ -4,7 +4,7 @@
 
 > Rede social de avaliações que conecta moradores de Belo Horizonte a pequenos e médios estabelecimentos de Alimentação, Entretenimento e Serviços — com rankings, reviews, fotos e reservas de mesa online.
 
-🔗 **Acesse o projeto:** [gostoo.vercel.app](https://gostoo.vercel.app) · API: [gostoo-36vv.onrender.com](https://gostoo-36vv.onrender.com)
+🔗 **Acesse o projeto:** [gostoo.vercel.app](https://gostoo.vercel.app)
 
 ---
 
