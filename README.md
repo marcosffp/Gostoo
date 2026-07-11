@@ -1,4 +1,4 @@
-<img width="1600" style="height:auto; border-radius: 12px;" alt="banner Gostô?" src="docs/images/gosto-banner.png" />
+<img width="1600" style="height:auto; border-radius: 12px;" alt="banner Gostô?" src="docs/images/banner.png" />
 
 # Gostô?
 
